@@ -14,6 +14,7 @@ const Slots      = React.lazy(() => import('../pages/Slots'));
 const Users      = React.lazy(() => import('../pages/Users'));
 const Payments   = React.lazy(() => import('../pages/Payments'));
 const Settings   = React.lazy(() => import('../pages/Settings'));
+const Profile    = React.lazy(() => import('../pages/Profile'));
 
 // ── Suspense wrapper using GlobalLoader ───────────────────────
 const LC = (Component) => (
@@ -48,6 +49,7 @@ const AllRoutes = () =>
             { path: 'users',        element: LC(Users)      },
             { path: 'payments',     element: LC(Payments)   },
             { path: 'settings',     element: LC(Settings)   },
+            { path: 'profile',      element: LC(Profile)    },
           ],
         },
       ],
