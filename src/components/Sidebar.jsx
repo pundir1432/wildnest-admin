@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarCheck, Tent, Clock, Users,
-  CreditCard, Settings, ChevronLeft, ChevronRight, TreePine
+  CreditCard, Settings, ChevronLeft, ChevronRight, TreePine, X
 } from 'lucide-react';
 
 const navItems = [
@@ -14,12 +14,16 @@ const navItems = [
   { to: '/admin/settings',   icon: Settings,        label: 'Settings'   },
 ];
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-logo">
         <TreePine size={28} className="logo-icon" />
         {!collapsed && <span className="logo-text">WildNest</span>}
+        {/* Close button — mobile only */}
+        <button className="sidebar-close-btn" onClick={onMobileClose}>
+          <X size={18} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">
@@ -27,15 +31,15 @@ export default function Sidebar({ collapsed, onToggle }) {
           <NavLink
             key={to}
             to={to}
-
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >
             <Icon size={20} />
-            {!collapsed && <span>{label}</span>}
+            <span>{label}</span>
           </NavLink>
         ))}
       </nav>
 
+      {/* Collapse toggle — desktop only */}
       <button className="sidebar-toggle" onClick={onToggle}>
         {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
       </button>
