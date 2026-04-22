@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBookings, updateBookingStatus } from '../redux/booking/thunk';
 import { clearBookingError } from '../redux/booking/slice';
 import StatusBadge from '../components/StatusBadge';
+import PageLoader from '../components/PageLoader';
 import { Download, Search, RefreshCw, X } from 'lucide-react';
 
 const STATUSES = ['All', 'draft', 'pending', 'confirmed', 'cancelled', 'completed'];
@@ -59,10 +60,10 @@ export default function Bookings() {
     dispatch(fetchBookings(params));
   };
 
+  if (loading) return <PageLoader />;
+
   return (
     <div className="page">
-
-      {/* ── Toolbar ── */}
       <div className="page-toolbar">
         <div className="filters">
           <div className="search-box">

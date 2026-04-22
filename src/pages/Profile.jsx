@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { User, Lock, Save, Eye, EyeOff, TreePine } from 'lucide-react';
 import { getProfile, updateProfileApi } from '../services/profileService';
 import { buildFormData } from '../services/activityService';
+import PageLoader from '../components/PageLoader';
 
 export default function Profile() {
   const { profile, updateProfile } = useAuth();
@@ -14,12 +15,13 @@ export default function Profile() {
   const [saving, setSaving]       = useState(false);
   const [toast, setToast]         = useState('');
   const [error, setError]         = useState('');
+  const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
     getProfile().then(res => {
       const u = res.data?.user || res.data;
       if (u) { setForm({ name: u.name, email: u.email, phone: u.phone || '', location: u.location || '', bio: u.bio || '' }); }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setProfileLoading(false));
   }, []);
 
   const set     = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -63,6 +65,8 @@ export default function Profile() {
       setSaving(false);
     }
   };
+
+  if (profileLoading) return <PageLoader />;
 
   return (
     <div className="page">
