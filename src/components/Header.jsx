@@ -4,14 +4,13 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const titles = {
-  '/admin/dashboard':  'Dashboard',
-  '/admin/bookings':   'Booking Management',
-  '/admin/activities': 'Activity Management',
-  '/admin/slots':      'Slot & Availability',
-  '/admin/users':      'User Management',
-  '/admin/payments':   'Payments & Reports',
-  '/admin/settings':   'Settings',
-  '/admin/profile':    'My Profile',
+  '/admin/dashboard': 'Dashboard',
+  '/admin/bookings':  'Booking Management',
+  '/admin/store':     'Store Management',
+  '/admin/users':     'User Management',
+  '/admin/payments':  'Payments & Reports',
+  '/admin/settings':  'Settings',
+  '/admin/profile':   'My Profile',
 };
 
 const notifications = [

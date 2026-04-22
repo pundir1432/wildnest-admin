@@ -9,10 +9,9 @@ const Login      = React.lazy(() => import('../pages/auth/Login'));
 const SignUp     = React.lazy(() => import('../pages/auth/SignUp'));
 const Dashboard  = React.lazy(() => import('../pages/Dashboard'));
 const Bookings   = React.lazy(() => import('../pages/Bookings'));
-const Activities = React.lazy(() => import('../pages/Activities'));
-const Slots      = React.lazy(() => import('../pages/Slots'));
 const Users      = React.lazy(() => import('../pages/Users'));
 const Payments   = React.lazy(() => import('../pages/Payments'));
+const Store      = React.lazy(() => import('../pages/Store'));
 const Settings   = React.lazy(() => import('../pages/Settings'));
 const Profile    = React.lazy(() => import('../pages/Profile'));
 
@@ -41,15 +40,14 @@ const AllRoutes = () =>
         {
           element: <AdminLayout />,
           children: [
-            { index: true,          element: <Navigate to="dashboard" replace /> },
-            { path: 'dashboard',    element: LC(Dashboard)  },
-            { path: 'bookings',     element: LC(Bookings)   },
-            { path: 'activities',   element: LC(Activities) },
-            { path: 'slots',        element: LC(Slots)      },
-            { path: 'users',        element: LC(Users)      },
-            { path: 'payments',     element: LC(Payments)   },
-            { path: 'settings',     element: LC(Settings)   },
-            { path: 'profile',      element: LC(Profile)    },
+            { index: true,       element: <Navigate to="dashboard" replace /> },
+            { path: 'dashboard', element: LC(Dashboard)  },
+            { path: 'bookings',  element: LC(Bookings)   },
+            { path: 'store',     element: LC(Store)      },
+            { path: 'users',     element: LC(Users)      },
+            { path: 'payments',  element: LC(Payments)   },
+            { path: 'settings',  element: LC(Settings)   },
+            { path: 'profile',   element: LC(Profile)    },
           ],
         },
       ],

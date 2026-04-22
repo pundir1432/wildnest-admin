@@ -1,17 +1,16 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, CalendarCheck, Tent, Clock, Users,
+  LayoutDashboard, CalendarCheck, Store, Clock, Users,
   CreditCard, Settings, ChevronLeft, ChevronRight, TreePine, X
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/admin/dashboard',  icon: LayoutDashboard, label: 'Dashboard'  },
-  { to: '/admin/bookings',   icon: CalendarCheck,   label: 'Bookings'   },
-  { to: '/admin/activities', icon: Tent,            label: 'Activities' },
-  { to: '/admin/slots',      icon: Clock,           label: 'Slots'      },
-  { to: '/admin/users',      icon: Users,           label: 'Users'      },
-  { to: '/admin/payments',   icon: CreditCard,      label: 'Payments'   },
-  { to: '/admin/settings',   icon: Settings,        label: 'Settings'   },
+  { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/bookings',  icon: CalendarCheck,   label: 'Bookings'  },
+  { to: '/admin/store',     icon: Store,           label: 'Store'     },
+  { to: '/admin/users',     icon: Users,           label: 'Users'     },
+  { to: '/admin/payments',  icon: CreditCard,      label: 'Payments'  },
+  { to: '/admin/settings',  icon: Settings,        label: 'Settings'  },
 ];
 
 export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }) {
