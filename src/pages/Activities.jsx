@@ -1,105 +1,184 @@
-import { useState } from 'react';
-import { activities as initial } from '../data/mockData';
-import StatusBadge from '../components/StatusBadge';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X, RefreshCw } from 'lucide-react';
+import {
+  getCamps, createCamp, updateCamp, deleteCamp,
+  getRaftings, createRafting, updateRafting, deleteRafting,
+  getRentals, createRental, updateRental, deleteRental,
+  buildFormData,
+} from '../services/activityService';
 
-const empty = { name: '', type: 'Rafting', price: '', duration: '', capacity: '', description: '', status: 'Active', image: '' };
-const TYPES = ['Rafting', 'Camp', 'Kayaking', 'Rental'];
+const TABS = ['camp', 'rafting', 'rental'];
+
+const FIELDS = {
+  camp:    [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'location', l: 'Location *', t: 'text' }, { k: 'price', l: 'Price (₹) *', t: 'number' }, { k: 'maxGuests', l: 'Max Guests', t: 'number' }, { k: 'amenities', l: 'Amenities (comma separated)', t: 'text' }, { k: 'description', l: 'Description', t: 'textarea' }],
+  rafting: [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'location', l: 'Location *', t: 'text' }, { k: 'price', l: 'Price (₹) *', t: 'number' }, { k: 'duration', l: 'Duration', t: 'text' }, { k: 'difficulty', l: 'Difficulty', t: 'select', opts: ['Easy', 'Medium', 'Hard'] }, { k: 'maxPersons', l: 'Max Persons', t: 'number' }, { k: 'description', l: 'Description', t: 'textarea' }],
+  rental:  [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'type', l: 'Type', t: 'select', opts: ['Scooter', 'Bike', 'Car', 'Other'] }, { k: 'pricePerDay', l: 'Price Per Day (₹) *', t: 'number' }, { k: 'description', l: 'Description', t: 'textarea' }],
+};
+
+const API = {
+  camp:    { getAll: getCamps,    create: createCamp,    update: updateCamp,    remove: deleteCamp    },
+  rafting: { getAll: getRaftings, create: createRafting, update: updateRafting, remove: deleteRafting },
+  rental:  { getAll: getRentals,  create: createRental,  update: updateRental,  remove: deleteRental  },
+};
 
 export default function Activities() {
-  const [data, setData] = useState(initial);
-  const [modal, setModal] = useState(null); // null | 'add' | 'edit'
-  const [form, setForm] = useState(empty);
-  const [editId, setEditId] = useState(null);
+  const [tab, setTab]         = useState('camp');
+  const [data, setData]       = useState({ camp: [], rafting: [], rental: [] });
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal]     = useState(null);
+  const [form, setForm]       = useState({});
+  const [images, setImages]   = useState([]);
+  const [editId, setEditId]   = useState(null);
+  const [saving, setSaving]   = useState(false);
+  const [error, setError]     = useState('');
 
-  const openAdd = () => { setForm(empty); setModal('add'); };
-  const openEdit = (act) => { setForm(act); setEditId(act.id); setModal('edit'); };
-  const close = () => setModal(null);
-
-  const save = () => {
-    if (!form.name || !form.price) return;
-    if (modal === 'add') {
-      setData(prev => [...prev, { ...form, id: `ACT${Date.now()}` }]);
-    } else {
-      setData(prev => prev.map(a => a.id === editId ? { ...form, id: editId } : a));
-    }
-    close();
+  const fetchTab = async (t = tab) => {
+    setLoading(true);
+    try {
+      const res = await API[t].getAll();
+      const list = res.data?.camps || res.data?.raftings || res.data?.rentals || res.data || [];
+      setData(prev => ({ ...prev, [t]: list }));
+    } catch { /* keep existing */ }
+    finally { setLoading(false); }
   };
 
-  const remove = (id) => setData(prev => prev.filter(a => a.id !== id));
+  useEffect(() => { fetchTab(tab); }, [tab]);
+
+  const openAdd  = () => { setForm({}); setImages([]); setEditId(null); setError(''); setModal('add'); };
+  const openEdit = (item) => { setForm({ ...item }); setImages([]); setEditId(item._id); setError(''); setModal('edit'); };
+  const close    = () => setModal(null);
+
+  const save = async () => {
+    setError('');
+    const required = FIELDS[tab].filter(f => f.l.includes('*'));
+    for (const f of required) {
+      if (!form[f.k]) { setError(`${f.l.replace(' *', '')} is required.`); return; }
+    }
+    setSaving(true);
+    try {
+      const fd = buildFormData(form, images);
+      if (modal === 'add') {
+        await API[tab].create(fd);
+      } else {
+        await API[tab].update(editId, fd);
+      }
+      close();
+      fetchTab();
+    } catch (e) {
+      setError(e.response?.data?.message || 'Save failed.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const remove = async (id) => {
+    if (!window.confirm('Delete this item?')) return;
+    try {
+      await API[tab].remove(id);
+      setData(prev => ({ ...prev, [tab]: prev[tab].filter(i => i._id !== id) }));
+    } catch { alert('Delete failed.'); }
+  };
+
+  const items = data[tab];
 
   return (
     <div className="page">
       <div className="page-toolbar">
-        <p className="toolbar-count">{data.length} activities</p>
-        <button className="btn btn-primary" onClick={openAdd}><Plus size={16} /> Add Activity</button>
+        <div className="activity-type-tabs">
+          {TABS.map(t => (
+            <button key={t} className={`activity-type-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
+              {t === 'camp' ? '⛺' : t === 'rafting' ? '🚣' : '🎒'}
+              {t.charAt(0).toUpperCase() + t.slice(1)}s
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-outline" onClick={() => fetchTab()}><RefreshCw size={15} /></button>
+          <button className="btn btn-primary" onClick={openAdd}><Plus size={15} /> Add {tab.charAt(0).toUpperCase() + tab.slice(1)}</button>
+        </div>
       </div>
 
-      <div className="cards-grid">
-        {data.map(act => (
-          <div className="activity-card" key={act.id}>
-            <img src={act.image} alt={act.name} className="activity-img" onError={e => e.target.style.display = 'none'} />
-            <div className="activity-body">
-              <div className="activity-header">
-                <h4>{act.name}</h4>
-                <StatusBadge status={act.status} />
-              </div>
-              <p className="activity-type">{act.type}</p>
-              <p className="activity-desc">{act.description}</p>
-              <div className="activity-meta">
-                <span>₹{act.price}/person</span>
-                <span>{act.duration}</span>
-                <span>Cap: {act.capacity}</span>
-              </div>
-              <div className="activity-actions">
-                <button className="btn btn-sm btn-outline" onClick={() => openEdit(act)}><Pencil size={14} /> Edit</button>
-                <button className="btn btn-sm btn-danger" onClick={() => remove(act.id)}><Trash2 size={14} /> Delete</button>
+      {loading ? (
+        <div className="empty-state">Loading...</div>
+      ) : items.length === 0 ? (
+        <div className="empty-state">No {tab}s found. Click "Add" to create one.</div>
+      ) : (
+        <div className="cards-grid">
+          {items.map(item => (
+            <div className="activity-card" key={item._id}>
+              {item.images?.[0] && (
+                <img src={item.images[0]} alt={item.name} className="activity-img" onError={e => e.target.style.display = 'none'} />
+              )}
+              <div className="activity-body">
+                <div className="activity-header">
+                  <h4>{item.name}</h4>
+                  <span className="badge badge-success">Active</span>
+                </div>
+                <p className="activity-type" style={{ textTransform: 'capitalize' }}>{tab}</p>
+                <p className="activity-desc">{item.description || '—'}</p>
+                <div className="activity-meta">
+                  <span>₹{(item.price || item.pricePerDay || 0).toLocaleString()}</span>
+                  {item.location && <span>📍 {item.location}</span>}
+                  {item.duration && <span>⏱ {item.duration}</span>}
+                  {item.difficulty && <span>⚡ {item.difficulty}</span>}
+                  {item.maxGuests && <span>👥 {item.maxGuests}</span>}
+                  {item.maxPersons && <span>👥 {item.maxPersons}</span>}
+                </div>
+                <div className="activity-actions">
+                  <button className="btn btn-sm btn-outline" onClick={() => openEdit(item)}><Pencil size={14} /> Edit</button>
+                  <button className="btn btn-sm btn-danger" onClick={() => remove(item._id)}><Trash2 size={14} /> Delete</button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {modal && (
         <div className="modal-overlay" onClick={close}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{modal === 'add' ? 'Add Activity' : 'Edit Activity'}</h3>
+              <h3>{modal === 'add' ? 'Add' : 'Edit'} {tab.charAt(0).toUpperCase() + tab.slice(1)}</h3>
               <button className="icon-btn" onClick={close}><X size={20} /></button>
             </div>
             <div className="modal-body">
-              {[
-                { label: 'Name', key: 'name', type: 'text' },
-                { label: 'Price (₹/person)', key: 'price', type: 'number' },
-                { label: 'Duration', key: 'duration', type: 'text' },
-                { label: 'Capacity', key: 'capacity', type: 'number' },
-                { label: 'Image URL', key: 'image', type: 'text' },
-              ].map(({ label, key, type }) => (
-                <div className="form-group" key={key}>
-                  <label>{label}</label>
-                  <input type={type} value={form[key]} onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))} />
+              {error && <div className="auth-error" style={{ marginTop: 0 }}>{error}</div>}
+              <div className="modal-form-grid">
+                {FIELDS[tab].map(({ k, l, t, opts }) => (
+                  t === 'textarea' ? (
+                    <div className="form-group full-width" key={k}>
+                      <label>{l}</label>
+                      <textarea rows={3} value={form[k] || ''} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))} />
+                    </div>
+                  ) : t === 'select' ? (
+                    <div className="form-group" key={k}>
+                      <label>{l}</label>
+                      <select value={form[k] || ''} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))}>
+                        <option value="">Select</option>
+                        {opts.map(o => <option key={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="form-group" key={k}>
+                      <label>{l}</label>
+                      <input type={t} value={form[k] || ''} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))} />
+                    </div>
+                  )
+                ))}
+                <div className="form-group full-width">
+                  <label>Images (max 10)</label>
+                  <input type="file" multiple accept="image/*" className="file-input"
+                    onChange={e => setImages(Array.from(e.target.files).slice(0, 10))} />
+                  {images.length > 0 && <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{images.length} file(s) selected</p>}
                 </div>
-              ))}
-              <div className="form-group">
-                <label>Type</label>
-                <select value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))}>
-                  {TYPES.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Status</label>
-                <select value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value }))}>
-                  <option>Active</option><option>Inactive</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
               </div>
             </div>
             <div className="modal-footer">
               <button className="btn btn-outline" onClick={close}>Cancel</button>
-              <button className="btn btn-primary" onClick={save}>Save</button>
+              <button className="btn btn-primary" onClick={save} disabled={saving}>
+                {saving ? <span className="btn-spinner" /> : null}
+                {saving ? 'Saving...' : 'Save'}
+              </button>
             </div>
           </div>
         </div>

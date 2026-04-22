@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TreePine, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -10,6 +10,15 @@ export default function Login() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const errorTimer = useRef(null);
+
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (!error) return;
+    clearTimeout(errorTimer.current);
+    errorTimer.current = setTimeout(() => setError(''), 5000);
+    return () => clearTimeout(errorTimer.current);
+  }, [error]);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
@@ -19,17 +28,14 @@ export default function Login() {
     if (!form.email || !form.password) { setError('Please fill in all fields.'); return; }
 
     setLoading(true);
-    // Simulate API call — replace with real API
-    await new Promise(r => setTimeout(r, 900));
-
-    // Demo credentials: admin@wildnest.com / admin123
-    if (form.email === 'admin@wildnest.com' && form.password === 'admin123') {
-      login();
+    try {
+      await login(form.email, form.password);
       navigate('/admin/dashboard', { replace: true });
-    } else {
-      setError('Invalid email or password.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Invalid email or password.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -42,7 +48,12 @@ export default function Login() {
         <h2 className="auth-title">Welcome back</h2>
         <p className="auth-subtitle">Sign in to your admin account</p>
 
-        {error && <div className="auth-error">{error}</div>}
+        {error && (
+          <div className="auth-error">
+            {error}
+            <div className="auth-error-bar" />
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -81,10 +92,6 @@ export default function Login() {
         <p className="auth-footer">
           Don't have an account? <Link to="/admin/signup">Create account</Link>
         </p>
-
-        <div className="auth-demo-hint">
-          <span>Demo: admin@wildnest.com / admin123</span>
-        </div>
       </div>
     </div>
   );
