@@ -4,6 +4,7 @@ import { getBookings } from '../services/bookingService';
 import StatusBadge from '../components/StatusBadge';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { Download, RefreshCw } from 'lucide-react';
+import PageLoader from '../components/PageLoader';
 
 const PERIODS = ['Weekly', 'Monthly'];
 
@@ -63,6 +64,8 @@ export default function Payments() {
     { label: 'Unpaid Bookings',    value: payDash?.unpaidBookings ?? '—',                        color: '#d97706' },
     { label: 'Refunded Bookings',  value: payDash?.refundedBookings ?? '—',                      color: '#dc2626' },
   ];
+
+  if (loading) return <PageLoader />;
 
   return (
     <div className="page">

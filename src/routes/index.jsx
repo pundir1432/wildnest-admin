@@ -12,6 +12,7 @@ const Bookings   = React.lazy(() => import('../pages/Bookings'));
 const Users      = React.lazy(() => import('../pages/Users'));
 const Payments   = React.lazy(() => import('../pages/Payments'));
 const Store      = React.lazy(() => import('../pages/Store'));
+const Gallery    = React.lazy(() => import('../pages/Gallery'));
 const Settings   = React.lazy(() => import('../pages/Settings'));
 const Profile    = React.lazy(() => import('../pages/Profile'));
 
@@ -44,6 +45,7 @@ const AllRoutes = () =>
             { path: 'dashboard', element: LC(Dashboard)  },
             { path: 'bookings',  element: LC(Bookings)   },
             { path: 'store',     element: LC(Store)      },
+            { path: 'gallery',   element: LC(Gallery)    },
             { path: 'users',     element: LC(Users)      },
             { path: 'payments',  element: LC(Payments)   },
             { path: 'settings',  element: LC(Settings)   },

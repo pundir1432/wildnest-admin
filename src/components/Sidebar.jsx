@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, CalendarCheck, Store, Clock, Users,
-  CreditCard, Settings, ChevronLeft, ChevronRight, TreePine, X
+  LayoutDashboard, CalendarCheck, Store, Users,
+  CreditCard, Settings, ChevronLeft, ChevronRight, TreePine, X, Image
 } from 'lucide-react';
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/bookings',  icon: CalendarCheck,   label: 'Bookings'  },
   { to: '/admin/store',     icon: Store,           label: 'Store'     },
+  { to: '/admin/gallery',   icon: Image,           label: 'Gallery'   },
   { to: '/admin/users',     icon: Users,           label: 'Users'     },
   { to: '/admin/payments',  icon: CreditCard,      label: 'Payments'  },
   { to: '/admin/settings',  icon: Settings,        label: 'Settings'  },

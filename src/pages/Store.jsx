@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Plus, Pencil, Trash2, X, RefreshCw } from 'lucide-react';
+import PageLoader from '../components/PageLoader';
 
 import { fetchCamps, createCamp, updateCamp, deleteCamp }       from '../redux/camp/thunnk';
 import { fetchRaftings, createRafting, updateRafting, deleteRafting } from '../redux/rafting/thunk';
@@ -49,6 +50,13 @@ const buildFormData = (fields, files = []) => {
 
 const TABS = ['camp', 'rafting', 'rental'];
 const ICONS = { camp: '⛺', rafting: '🚣', rental: '🎒' };
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+const getImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `${BASE_URL}/${path}`;
+};
 
 export default function Store() {
   const dispatch = useDispatch();
@@ -153,11 +161,12 @@ export default function Store() {
     );
   };
 
-  const colCount = COLS[tab].length + 2; // +2 for image col + actions
+  const colCount = COLS[tab].length + 2;
+
+  if (loading && items.length === 0) return <PageLoader />;
 
   return (
     <div className="page">
-
       {/* ── Toolbar ── */}
       <div className="page-toolbar">
         <div className="activity-type-tabs">
@@ -204,7 +213,7 @@ export default function Store() {
                 <tr key={item._id}>
                   <td>
                     {item.images?.[0]
-                      ? <img src={item.images[0]} alt="" className="table-thumb" onError={e => e.target.style.display = 'none'} />
+                      ? <img src={getImageUrl(item.images[0])} alt="" className="table-thumb" onError={e => e.target.style.display = 'none'} />
                       : <div className="table-thumb-placeholder">{ICONS[tab]}</div>
                     }
                   </td>

@@ -6,6 +6,7 @@ import {
 import { CalendarCheck, IndianRupee, Users, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { getDashboard, getPaymentDashboard } from '../services/dashboardService';
 import StatusBadge from '../components/StatusBadge';
+import PageLoader from '../components/PageLoader';
 
 const COLORS = ['#2563eb', '#16a34a', '#d97706', '#dc2626'];
 
@@ -73,23 +74,38 @@ export default function Dashboard() {
     { label: 'Total Camps',    value: dash?.totalCamps ?? '—', icon: TrendingUp, color: '#d97706' },
   ];
 
-  // Build activity revenue from paymentDashboard revenueByType
-  const activityRevenue = (payDash?.revenueByType || []).map((r, i) => {
-    const meta = {
-      camp:    { color: '#16a34a', bg: '#f0fdf4', icon: '⛺' },
-      rafting: { color: '#2563eb', bg: '#eff6ff', icon: '🚣' },
-      rental:  { color: '#7c3aed', bg: '#f5f3ff', icon: '🎒' },
-    };
-    const m = meta[r._id] || { color: COLORS[i % COLORS.length], bg: '#f8fafc', icon: '🏕️' };
-    return { name: r._id.charAt(0).toUpperCase() + r._id.slice(1), revenue: r.total, bookings: r.count, ...m };
-  });
+  // Build from dashboard direct fields: totalCamps, totalRafting, totalRentals
+  const ACTIVITY_META = [
+    { key: 'totalCamps',    name: 'Camp',    icon: '⛺', color: '#16a34a', bg: '#f0fdf4' },
+    { key: 'totalRafting',  name: 'Rafting', icon: '🚣', color: '#2563eb', bg: '#eff6ff' },
+    { key: 'totalRentals',  name: 'Rental',  icon: '🎒', color: '#7c3aed', bg: '#f5f3ff' },
+  ];
+
+  // If payDash has revenueByType use it, else fall back to dash counts
+  const activityRevenue = (() => {
+    if (payDash?.revenueByType?.length) {
+      return payDash.revenueByType.map(r => {
+        const m = ACTIVITY_META.find(a => a.name.toLowerCase() === r._id) || ACTIVITY_META[0];
+        return { name: m.name, revenue: r.total, bookings: r.count, color: m.color, bg: m.bg, icon: m.icon };
+      });
+    }
+    // fallback: use totalCamps/totalRafting/totalRentals from dashboard
+    return ACTIVITY_META
+      .map(m => ({ ...m, bookings: dash?.[m.key] || 0, revenue: 0 }))
+      .filter(a => a.bookings > 0);
+  })();
+
+  // Pie data — always built from dash totals so all 3 show
+  const pieData = ACTIVITY_META
+    .map(m => ({ name: m.name, value: dash?.[m.key] || 0, color: m.color }))
+    .filter(d => d.value > 0);
 
   const totalRev = activityRevenue.reduce((s, a) => s + a.revenue, 0);
-  const maxRev = Math.max(...activityRevenue.map(a => a.revenue), 1);
-
-  const pieData = activityRevenue.map(a => ({ name: a.name, value: a.bookings }));
+  const maxRev   = Math.max(...activityRevenue.map(a => a.revenue), 1);
 
   const recentBookings = dash?.recentBookings || [];
+
+  if (loading) return <PageLoader />;
 
   return (
     <div className="page">
@@ -189,11 +205,19 @@ export default function Dashboard() {
           <h3 className="card-title">Bookings by Activity</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
-              <Pie data={pieData.length ? pieData : [{ name: 'No data', value: 1 }]} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-                {(pieData.length ? pieData : [{}]).map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+              <Pie
+                data={pieData.length ? pieData : [{ name: 'No data', value: 1, color: '#e2e8f0' }]}
+                dataKey="value"
+                nameKey="name"
+                cx="50%" cy="50%"
+                innerRadius={50} outerRadius={80}
+              >
+                {(pieData.length ? pieData : [{ color: '#e2e8f0' }]).map((entry, i) => (
+                  <Cell key={i} fill={entry.color || COLORS[i % COLORS.length]} />
+                ))}
               </Pie>
               <Legend iconType="circle" iconSize={10} />
-              <Tooltip />
+              <Tooltip formatter={(v, name) => [`${v} items`, name]} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -205,20 +229,20 @@ export default function Dashboard() {
         <div className="table-wrap">
           <table className="table">
             <thead>
-              <tr><th>ID</th><th>User</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+              <tr><th>ID</th><th>User</th><th>Activity</th><th>Type</th><th>Check-In</th><th>Guests</th><th>Amount</th><th>Status</th></tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr><td colSpan={6} className="empty-row">Loading...</td></tr>
-              ) : recentBookings.length === 0 ? (
-                <tr><td colSpan={6} className="empty-row">No recent bookings</td></tr>
+              {recentBookings.length === 0 ? (
+                <tr><td colSpan={8} className="empty-row">No recent bookings</td></tr>
               ) : recentBookings.slice(0, 5).map((b, i) => (
                 <tr key={b._id || i}>
-                  <td>{b._id?.slice(-6).toUpperCase() || '—'}</td>
-                  <td>{b.user?.name || b.userName || '—'}</td>
-                  <td>{b.bookingType || b.type || '—'}</td>
-                  <td>{b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : '—'}</td>
-                  <td>₹{(b.totalAmount || b.amount || 0).toLocaleString()}</td>
+                  <td className="mono-id">{b._id?.slice(-6).toUpperCase()}</td>
+                  <td>{b.user?.name || '—'}</td>
+                  <td>{b.itemId?.name || '—'}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{b.bookingType || '—'}</td>
+                  <td>{b.checkIn ? new Date(b.checkIn).toLocaleDateString('en-IN') : '—'}</td>
+                  <td>{b.guests ?? '—'}</td>
+                  <td>₹{(b.totalAmount || 0).toLocaleString()}</td>
                   <td><StatusBadge status={b.status} /></td>
                 </tr>
               ))}
