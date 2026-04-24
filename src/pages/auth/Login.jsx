@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ phone: '', password: '' });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,14 +25,14 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.email || !form.password) { setError('Please fill in all fields.'); return; }
+    if (!form.phone || !form.password) { setError('Please fill in all fields.'); return; }
 
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      await login(form.phone, form.password);
       navigate('/admin/dashboard', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password.');
+      setError(err.response?.data?.message || 'Invalid phone or password.');
     } finally {
       setLoading(false);
     }
@@ -57,13 +57,13 @@ export default function Login() {
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label>Phone Number</label>
             <input
-              type="email"
-              placeholder="admin@wildnest.com"
-              value={form.email}
-              onChange={e => set('email', e.target.value)}
-              autoComplete="email"
+              type="tel"
+              placeholder="9876543210"
+              value={form.phone}
+              onChange={e => set('phone', e.target.value)}
+              autoComplete="tel"
             />
           </div>
 

@@ -11,7 +11,7 @@ const TABS = ['camp', 'rafting', 'rental'];
 
 const FIELDS = {
   camp:    [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'location', l: 'Location *', t: 'text' }, { k: 'price', l: 'Price (₹) *', t: 'number' }, { k: 'maxGuests', l: 'Max Guests', t: 'number' }, { k: 'amenities', l: 'Amenities (comma separated)', t: 'text' }, { k: 'description', l: 'Description', t: 'textarea' }],
-  rafting: [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'location', l: 'Location *', t: 'text' }, { k: 'price', l: 'Price (₹) *', t: 'number' }, { k: 'duration', l: 'Duration', t: 'text' }, { k: 'difficulty', l: 'Difficulty', t: 'select', opts: ['Easy', 'Medium', 'Hard'] }, { k: 'maxPersons', l: 'Max Persons', t: 'number' }, { k: 'description', l: 'Description', t: 'textarea' }],
+  rafting: [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'location', l: 'Location *', t: 'text' }, { k: 'price', l: 'Price (₹) *', t: 'number' }, { k: 'duration', l: 'Duration', t: 'text' }, { k: 'distanceKm', l: 'Distance (km) *', t: 'number' }, { k: 'startPoint', l: 'Start Point (Yahan Se) *', t: 'text' }, { k: 'endPoint', l: 'End Point (Yahan Tak) *', t: 'text' }, { k: 'difficulty', l: 'Difficulty', t: 'select', opts: ['Easy', 'Medium', 'Hard'] }, { k: 'maxPersons', l: 'Max Persons', t: 'number' }, { k: 'description', l: 'Description', t: 'textarea' }],
   rental:  [{ k: 'name', l: 'Name *', t: 'text' }, { k: 'type', l: 'Type', t: 'select', opts: ['Scooter', 'Bike', 'Car', 'Other'] }, { k: 'pricePerDay', l: 'Price Per Day (₹) *', t: 'number' }, { k: 'description', l: 'Description', t: 'textarea' }],
 };
 
@@ -120,6 +120,9 @@ export default function Activities() {
                   <span>₹{(item.price || item.pricePerDay || 0).toLocaleString()}</span>
                   {item.location && <span>📍 {item.location}</span>}
                   {item.duration && <span>⏱ {item.duration}</span>}
+                  {item.distanceKm && <span>📏 {item.distanceKm} km</span>}
+                  {item.startPoint && <span>🟢 {item.startPoint}</span>}
+                  {item.endPoint && <span>🔴 {item.endPoint}</span>}
                   {item.difficulty && <span>⚡ {item.difficulty}</span>}
                   {item.maxGuests && <span>👥 {item.maxGuests}</span>}
                   {item.maxPersons && <span>👥 {item.maxPersons}</span>}

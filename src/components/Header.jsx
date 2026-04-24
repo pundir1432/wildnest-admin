@@ -9,6 +9,7 @@ const titles = {
   '/admin/bookings':  'Booking Management',
   '/admin/store':     'Store Management',
   '/admin/gallery':   'Gallery',
+  '/admin/ratings':   'Ratings & Reviews',
   '/admin/users':     'User Management',
   '/admin/payments':  'Payments & Reports',
   '/admin/settings':  'Settings',

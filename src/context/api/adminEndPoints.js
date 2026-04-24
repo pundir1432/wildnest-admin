@@ -10,6 +10,7 @@ export const ADMIN_PAYMENT_DASHBOARD = '/api/admin/payment-dashboard';
 // ── Admin Bookings ────────────────────────────────
 export const ADMIN_BOOKINGS          = '/api/admin/bookings';
 export const ADMIN_BOOKING_STATUS    = (id) => `/api/admin/bookings/${id}/status`;
+export const ADMIN_BOOKING_PDF       = (id) => `/api/admin/bookings/${id}/pdf`;
 
 // ── Admin Users ───────────────────────────────────
 export const ADMIN_USERS             = '/api/admin/users';
@@ -31,3 +32,10 @@ export const ADMIN_RENTAL            = (id) => `/api/admin/rentals/${id}`;
 // ── Admin Gallery ─────────────────────────────────
 export const ADMIN_GALLERY           = '/api/admin/gallery';
 export const ADMIN_GALLERY_ITEM      = (id) => `/api/admin/gallery/${id}`;
+
+// ── Admin Ratings ────────────────────────────────
+export const ADMIN_RATINGS           = '/api/admin/ratings';
+export const ADMIN_RATING            = (id) => `/api/admin/ratings/${id}`;
+
+// ── User Bookings (user token) ────────────────────
+export const USER_BOOKINGS           = '/api/bookings';
