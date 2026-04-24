@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
   });
 
   // ── Login ──────────────────────────────────────────────────
-  const login = async (email, password) => {
-    const res = await loginApi({ email, password });
+  const login = async (phone, password) => {
+    const res = await loginApi({ phone, password });
     const { token, user } = res.data;
     localStorage.setItem('adminToken', token);
     localStorage.setItem('adminLoggedIn', 'true');

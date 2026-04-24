@@ -1199,8 +1199,8 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 80px 24px;
   width: 100%;
+  height: calc(100vh - var(--header-h));
 }
 .page-loader-spinner {
   width: 40px;
@@ -1470,3 +1470,146 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
   .gallery-cat-tabs { gap: 2px; }
   .gallery-cat-btn { padding: 5px 10px; font-size: 12px; }
 }
+
+/* ── Extra-large modal ── */
+.modal-xl { max-width: 780px; }
+
+/* ── Itinerary section ── */
+.itinerary-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.itinerary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.itinerary-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.itinerary-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.itinerary-day-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: #eff6ff;
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.itinerary-fields {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.itinerary-fields input {
+  flex: 1;
+  min-width: 140px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  font-family: inherit;
+}
+.itinerary-fields input:focus { border-color: var(--primary); }
+
+@media (max-width: 600px) {
+  .modal-xl { max-width: 100%; }
+  .itinerary-fields { flex-direction: column; }
+}
+
+/* ── Ratings summary ── */
+.ratings-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+.rating-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+}
+.rating-summary-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.rating-summary-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* ── Star row ── */
+.star-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.star-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* ── Review text ── */
+.rating-review-text {
+  font-size: 12px;
+  color: var(--text);
+  max-width: 220px;
+  line-height: 1.5;
+  white-space: normal;
+}
+
+/* ── Booking tab switcher ── */
+.booking-tab-switcher {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+.booking-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.booking-tab-btn:hover  { background: var(--bg); color: var(--text); }
+.booking-tab-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 6px rgba(37,99,235,0.3); }

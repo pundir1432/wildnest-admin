@@ -5,7 +5,7 @@ import PageLoader from '../components/PageLoader';
 import { Plus, Pencil, Trash2, X, RefreshCw, Image } from 'lucide-react';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-const CATEGORIES = ['all', 'camp', 'rafting', 'kayaking', 'rental', 'night', 'food', 'general'];
+const CATEGORIES = ['all', 'camp', 'rafting', 'kayaking', 'rental', 'night', 'food', 'general', 'bungee'];
 
 const CAT_ICONS = {
   all:      '🖼️',
@@ -16,6 +16,7 @@ const CAT_ICONS = {
   night:    '🌙',
   food:     '🍽️',
   general:  '📷',
+  bungee:   '🪂',
 };
 
 const getImageUrl = (path) => {
@@ -206,7 +207,7 @@ export default function Gallery() {
               <div className="form-group">
                 <label>Category</label>
                 <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}>
-                  {['camp', 'rafting', 'kayaking', 'rental', 'night', 'food', 'general'].map(c => (
+                  {['camp', 'rafting', 'kayaking', 'rental', 'night', 'food', 'general', 'bungee'].map(c => (
                     <option key={c}>{c}</option>
                   ))}
                 </select>

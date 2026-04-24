@@ -34,8 +34,7 @@ export default function Profile() {
     if (!form.name || !form.email) { setError('Name and email are required.'); return; }
     setSaving(true);
     try {
-      const fd = buildFormData(form, avatar ? [avatar] : []);
-      // profileImage field name
+      const fd = buildFormData(form, []);
       if (avatar) fd.set('profileImage', avatar);
       await updateProfileApi(fd);
       updateProfile(form);
